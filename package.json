@@ -1,0 +1,17 @@
+{
+  "name": "twZip.js",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "line-reader": "~0.2.3",
+    "line-by-line": "~0.1.1",
+    "rimraf": "~2.2.8"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "EragonJ",
+  "license": "ISC"
+}
