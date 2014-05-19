@@ -1,15 +1,50 @@
 <!doctype html>
-<html class="no-js" lang="">
+<html lang="en">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <title>twZip.js</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
     </head>
     <body>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <script src="src/twZip.js"></script>
         <script src="public/js/index.js"></script>
+        <div class="container">
+          <h1>twZip.js</h1>
+          <form class="form-horizontal" role="form">
+            <div class="form-group">
+              <label for="select1" class="col-sm-2 control-label">縣|市|台|島</label>
+              <div class="col-sm-2">
+                <select class="form-control" id="select1">
+                  <option>None</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="select2" class="col-sm-2 control-label">鄉|鎮|市|區|群島</label>
+              <div class="col-sm-2">
+                <select class="form-control" id="select2">
+                  <option>None</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="select3" class="col-sm-2 control-label"> 路|街|巷|村|段|市場</label>
+              <div class="col-sm-2">
+                <select class="form-control" id="select3">
+                  <option>None</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-default">OK</button>
+              </div>
+            </div>
+          </form>
+        </div>
     </body>
 </html>
