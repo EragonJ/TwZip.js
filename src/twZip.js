@@ -37,22 +37,48 @@
   }
 
   var TwZip = function(userOptions) {
-    this.options = $.extend(userOptions, {
-      dataOrigin: 'local'
-    });
+    this.dataOrigin = userOptions.dataOrigin;
+    this.summarySuffix = 'summary.json';
 
     this._init();
   };
 
   TwZip.prototype = {
     _init: function() {
+      this._zipCache = {};
+
       this._reField = {};
       this._reField[0] = /[縣市島台]/;
       this._reField[1] = /([鄉市鎮區]|群島)/;
       this._reField[2] = /([路街巷村段]|市場)/;
     },
-    _fetchData: function(cb) {
-      $.ajax(this.dataOrigin).done(cb);
+    _fetchData: function(zipFields, cb) {
+      var self = this;
+
+      // we would fetch the summary
+      zipFields.push(this.summarySuffix);
+      
+      $.ajax({
+        url: this.dataOrigin + zipFields.join('/')
+      }).done(function(data) {
+        var summary = data.summary;
+        summary = self._changeDataToObject(summary);
+
+        if (zipFields.length === 1) {
+          self._zipCache = summary;
+        }
+        else if (zipFields.length === 2) {
+          self._zipCache[zipFields[0]] = summary;
+        }
+        else if (zipFields.length === 3) {
+          self._zipCache[zipFields[0]][zipFields[1]] = summary;
+        }
+        else {
+          self._zipCache[zipFields[0]][zipFields[1]][zipFields[2]] = summary;
+        }
+
+        cb(summary); 
+      });
     },
     /*
      *  We would try to tokenize userInput to get fields.
@@ -88,9 +114,59 @@
         return _cachedArray;
       }
     },
+    _transformCommonWords: function(words) {
+      // add more rules here
+      words = words.replace(/台/g, '臺');
+      return words;
+    },
+    _inCache: function(zipFields) {
+      if (zipFields.length === 0) {
+        if ($.isEmptyObject(this._zipCache)) {
+          return false;
+        }
+        return this._zipCache;
+      }
+      else if (zipFields.length === 1) {
+        if (!this._zipCache[zipFields[0]]) {
+          return false; 
+        }
+        return this._zipCache[zipFields[0]];
+      }
+      else if (zipFields.length === 2) {
+        if (!this._zipCache[zipFields[0]][zipFields[1]]) {
+          return false;
+        }
+        return this._zipCache[zipFields[0]][zipFields[1]];
+      }
+      else {
+        if (!this._zipCache[zipFields[0]][zipFields[1]][zipFields[2]]) {
+          return false;
+        }
+        return this._zipCache[zipFields[0]][zipFields[1]][zipFields[2]];
+      }
+    },
+    _changeDataToObject: function(summary) {
+      var obj = {};
+      summary.forEach(function(key) {
+        obj[key] = false;
+      });
+      return obj;
+    },
     search: function(userInput, cb) {
-      var processedUserInput = this._processUserInput(userInput);
-      this._fetchData(cb);
+      var zipFields;
+      var cacheZip;
+      cb = cb || function() {};
+
+      userInput = this._transformCommonWords(userInput);
+      zipFields = this._processUserInput(userInput);
+      cacheZip = this._inCache(zipFields);
+
+      if (cacheZip) {
+        cb(cacheZip);
+      }
+      else {
+        this._fetchData(zipFields, cb);
+      }
     }
   };
 
