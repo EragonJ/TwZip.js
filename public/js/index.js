@@ -18,17 +18,35 @@ $(document).ready(function() {
   });
 
   function search(words, nextLayer) {
+    // clean up following fields
+    for (var i = nextLayer; i <= 3; i++) {
+      $('#select' + i).empty();
+    }
+
+    // if there is any dummy words, just early return
+    if (words.match('dummy')) {
+      return;
+    }
+
     twZip.search(words, function(data) {
       var optionDOM;
       var options = [];
       Object.keys(data).forEach(function(key) {
         optionDOM = document.createElement('option');
         optionDOM.textContent = key;
+        optionDOM.value = key;
         options.push(optionDOM);
       });
 
       if (data) {
-        $('#select' + nextLayer).empty().append(options);
+        var dummyOption = document.createElement('option');
+        dummyOption.textContent = '請選擇';
+        dummyOption.value = 'dummy';
+
+        $('#select' + nextLayer)
+          .empty()
+          .append(dummyOption)
+          .append(options);
       }
     });
   }
