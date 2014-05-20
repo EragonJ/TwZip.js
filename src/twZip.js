@@ -49,8 +49,8 @@
 
       this._reField = {};
       this._reField[0] = /[縣市島台]/;
-      this._reField[1] = /([鄉市鎮區]|群島)/;
-      this._reField[2] = /([路街巷村段]|市場)/;
+      this._reField[1] = /([鄉市鎮區台]|群島)/;
+      this._reField[2] = /([路街巷村段台]|市場)/;
     },
     _fetchData: function(zipFields, cb) {
       var self = this;
@@ -115,7 +115,13 @@
       }
     },
     _transformCommonWords: function(words) {
-      // add more rules here
+      // we won't do anything to words in blacklist
+      var reBlacklist = /(釣魚台)/g;
+      if (words.match(reBlacklist)) {
+        return words;
+      }
+
+      // process other words
       words = words.replace(/台/g, '臺');
       return words;
     },
