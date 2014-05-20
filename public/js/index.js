@@ -27,7 +27,9 @@ $(document).ready(function() {
         options.push(optionDOM);
       });
 
-      $('#select' + nextLayer).empty().append(options);
+      if (data) {
+        $('#select' + nextLayer).empty().append(options);
+      }
     });
   }
 
