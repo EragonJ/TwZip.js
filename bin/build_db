@@ -5,7 +5,7 @@ var rimraf = require('rimraf');
 
 var baseFolder = path.join(__dirname, '..', 'data', 'db');
 var zipFile = path.resolve(__dirname, '..', 'data', 'original', 
-  'twZip.10303.csv');
+  'twZip.10211.csv');
 var hash = {};
 var DEBUG = false;
 
