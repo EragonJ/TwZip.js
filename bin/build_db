@@ -3,8 +3,9 @@ var path = require('path');
 var lineReader = require('line-reader');
 var rimraf = require('rimraf');
 
-var baseFolder = path.join(__dirname, 'data', 'db');
-var zipFile = path.resolve(__dirname, 'data', 'original', 'twZip.10303.csv');
+var baseFolder = path.join(__dirname, '..', 'data', 'db');
+var zipFile = path.resolve(__dirname, '..', 'data', 'original', 
+  'twZip.10303.csv');
 var hash = {};
 var DEBUG = false;
 
