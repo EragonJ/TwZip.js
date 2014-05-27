@@ -45,15 +45,12 @@
   TwZip.prototype = {
     _init: function() {
       this._zipCache = {};
-
       this._reField = {};
       this._reField[0] = /[縣市島台]/;
       this._reField[1] = /([鄉市鎮區台]|群島)/;
       this._reField[2] = /([路街巷村段台]|市場)/;
     },
     _fetchData: function(zipFields) {
-      var self = this;
-
       // we would fetch the summary
       zipFields.push(this.summarySuffix);
 
@@ -145,19 +142,19 @@
       var summary = data.summary;
       summary = this._changeDataToObject(summary);
 
-      console.log(zipFields);
-      if (zipFields.length === 0) {
+      // ['summary.json']
+      if (zipFields.length === 1) {
         this._zipCache = summary;
       }
-      else if (zipFields.length === 1) {
-        this._zipCache = summary;
-      }
+      // ['台北市', 'summary.json']
       else if (zipFields.length === 2) {
         this._zipCache[zipFields[0]] = summary;
       }
+      // ['台北市', '信義區', 'summary.json']
       else if (zipFields.length === 3) {
         this._zipCache[zipFields[0]][zipFields[1]] = summary;
       }
+      // ['台北市', '信義區', '信義路', 'summary.json']
       else {
         this._zipCache[zipFields[0]][zipFields[1]][zipFields[2]] = summary;
       }
@@ -167,6 +164,7 @@
       var cacheZip;
       var self;
       var deferredList = [];
+      var partOfZipcode;
       var partOfZipcodeList = [];
       cb = cb || function() {};
 
@@ -175,10 +173,12 @@
 
       // twZip.search('');
       if (zipFields.length === 0) {
-        if (!this._inCache([])) {
-          var deferred = this._fetchData([]);
+        partOfZipcode = [];
+        partOfZipcodeList.push(partOfZipcode);
+
+        if (!this._inCache(partOfZipcode)) {
+          var deferred = this._fetchData(partOfZipcode);
           deferredList.push(deferred);
-          partOfZipcodeList.push([]);
         }
       }
       // twZip.search('台北市信義區信義路')
@@ -188,7 +188,7 @@
           // ['台北市']
           // ['台北市', '信義區']
           // ['台北市', '信義區', '信義路']
-          var partOfZipcode = zipFields.slice(0, i + 1);
+          partOfZipcode = zipFields.slice(0, i + 1);
           partOfZipcodeList.push(partOfZipcode);
 
           if (!this._inCache(partOfZipcode)) {
