@@ -17,6 +17,22 @@ $(document).ready(function() {
     search(searchWords, 3); 
   });
 
+  $('#input1').on('change', function() {
+    var $select = $('#select4');
+    twZip.search($(this).val(), function(data) {
+      if (data) {
+        var options = [];
+        Object.keys(data).forEach(function(key) {
+          optionDOM = document.createElement('option');
+          optionDOM.textContent = key;
+          optionDOM.value = key;
+          options.push(optionDOM);
+        });
+        $select.empty().append(options);
+      }
+    });
+  });
+
   function search(words, nextLayer) {
     // clean up following fields
     for (var i = nextLayer; i <= 3; i++) {
