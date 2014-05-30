@@ -1,33 +1,12 @@
 /*
- * var twZip = new TwZip({
- *   dataOrigin: 'local|http://xxx.xxx.xx',
- * });
+ * TwZip.js - A jQuery plugin that can help you search Taiwan Zipcode without
+ * backend support. All you have to do is setup the basic environment for
+ * generated json files and that's it !
  *
- * TwZip.search('臺北市', function(data) {});
+ * Author: EragonJ <eragonj@eragonj.me>
+ * Blog: http://eragonj.me
  *
- * Without data:
- * {
- *   summary: []
- * }
- *
- * With data:
- * {
- *   "summary":[
- *     "中正區",
- *     "大同區",
- *     "中山區",
- *     "松山區",
- *     "大安區",
- *     "萬華區",
- *     "信義區",
- *     "士林區",
- *     "北投區",
- *     "內湖區",
- *     "南港區",
- *     "文山區"
- *   ]
- * }
- *
+ * @preseve
  */
 (function(exports) {
   'use strict';
