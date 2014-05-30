@@ -1,33 +1,12 @@
 /*
- * var twZip = new TwZip({
- *   dataOrigin: 'local|http://xxx.xxx.xx',
- * });
+ * TwZip.js - A jQuery plugin that can help you search Taiwan Zipcode without
+ * backend support. All you have to do is setup the basic environment for
+ * generated json files and that's it !
  *
- * TwZip.search('臺北市', function(data) {});
+ * Author: EragonJ <eragonj@eragonj.me>
+ * Blog: http://eragonj.me
  *
- * Without data:
- * {
- *   summary: []
- * }
- *
- * With data:
- * {
- *   "summary":[
- *     "中正區",
- *     "大同區",
- *     "中山區",
- *     "松山區",
- *     "大安區",
- *     "萬華區",
- *     "信義區",
- *     "士林區",
- *     "北投區",
- *     "內湖區",
- *     "南港區",
- *     "文山區"
- *   ]
- * }
- *
+ * @preseve
  */
 (function(exports) {
   'use strict';
@@ -45,22 +24,28 @@
   TwZip.prototype = {
     _init: function() {
       this._zipCache = {};
-      this._reField = {};
+      this._reField = [];
       this._reField[0] = /[縣市島台]/;
       this._reField[1] = /([鄉市鎮區台]|群島)/;
       this._reField[2] = /([路街巷村段台]|市場)/;
     },
     _fetchData: function(zipFields) {
-      // we would fetch the summary
+      // path will become something like :
+      //   server/台北市/信義區/信義路/summary.json
+      //   server/台北市/信義區/summary.json
+      //   server/台北市/summary.json
+      //   server/summary.json
+      var zipFields = zipFields.slice(0);
       zipFields.push(this.summarySuffix);
 
-      var deferred = $.getJSON(this.dataOrigin + zipFields.join('/'));
+      var path = this.dataOrigin + zipFields.join('/');
+      var deferred = $.getJSON(path);
       return deferred;
     },
     /*
      *  We would try to tokenize userInput to get fields.
      */
-    _processUserInput: function(userInput, layer, _cachedArray) {
+    _getZipFields: function(userInput, layer, _cachedArray) {
       if (!layer) {
         layer = 0;
       }
@@ -84,7 +69,7 @@
 
         // keep the field in the cachedArray
         _cachedArray.push(matchedField);
-        return this._processUserInput(otherField, layer + 1, _cachedArray);
+        return this._getZipFields(otherField, layer + 1, _cachedArray);
       }
       else {
         // can't find anything more, just return
@@ -102,7 +87,7 @@
       words = words.replace(/台/g, '臺');
       return words;
     },
-    _inCache: function(zipFields) {
+    _getCache: function(zipFields) {
       if (zipFields.length === 0) {
         if ($.isEmptyObject(this._zipCache)) {
           return false;
@@ -140,22 +125,27 @@
     },
     _storeSummaryIntoCache: function(zipFields, data) {
       var summary = data.summary;
-      summary = this._changeDataToObject(summary);
 
-      // ['summary.json']
-      if (zipFields.length === 1) {
+      // If the data is from server, then we have to transform the
+      // type of data.
+      if ($.isArray(summary)) {
+        summary = this._changeDataToObject(summary);
+      }
+
+      // []
+      if (zipFields.length === 0) {
         this._zipCache = summary;
       }
-      // ['台北市', 'summary.json']
-      else if (zipFields.length === 2) {
+      // ['台北市']
+      else if (zipFields.length === 1) {
         this._zipCache[zipFields[0]] = summary;
       }
-      // ['台北市', '信義區', 'summary.json']
-      else if (zipFields.length === 3) {
+      // ['台北市', '信義區']
+      else if (zipFields.length === 2) {
         this._zipCache[zipFields[0]][zipFields[1]] = summary;
       }
-      // ['台北市', '信義區', '信義路', 'summary.json']
-      else {
+      // ['台北市', '信義區', '信義路']
+      else if (zipFields.length === 3) {
         this._zipCache[zipFields[0]][zipFields[1]][zipFields[2]] = summary;
       }
     },
@@ -169,14 +159,14 @@
       cb = cb || function() {};
 
       userInput = this._transformCommonWords(userInput);
-      zipFields = this._processUserInput(userInput);
+      zipFields = this._getZipFields(userInput);
 
       // twZip.search('');
       if (zipFields.length === 0) {
         partOfZipcode = [];
         partOfZipcodeList.push(partOfZipcode);
 
-        if (!this._inCache(partOfZipcode)) {
+        if (!this._getCache(partOfZipcode)) {
           var deferred = this._fetchData(partOfZipcode);
           deferredList.push(deferred);
         }
@@ -191,10 +181,22 @@
           partOfZipcode = zipFields.slice(0, i + 1);
           partOfZipcodeList.push(partOfZipcode);
 
-          if (!this._inCache(partOfZipcode)) {
-            var deferred = this._fetchData(partOfZipcode);
-            deferredList.push(deferred);
+          var deferred;
+          var cache = this._getCache(partOfZipcode);
+
+          if (!cache) {
+            deferred = this._fetchData(partOfZipcode);
           }
+          else {
+            // If the data has been stored in our cache, we will just fetch it
+            // out and keep in a deferred object to make the interface
+            // consistent.
+            deferred = $.Deferred();
+            deferred.resolve({
+              summary: cache  
+            });
+          }
+          deferredList.push(deferred);
         }
       }
 
@@ -214,11 +216,11 @@
               }
             }.bind(this));
           }
-          cb(this._inCache(zipFields));
+          cb(this._getCache(zipFields));
         }.bind(this));
       }
       else {
-        cb(this._inCache(zipFields));
+        cb(this._getCache(zipFields));
       }
     }
   };
