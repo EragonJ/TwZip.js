@@ -10,10 +10,8 @@ generated json files and that's it !
 
 Just `make db` !
 
-By default, zipcode data will be generated inside a folder called `data/db`
-at the same folder of `makefile`. When running this command, it will take about
-30 ~ 40 seconds to build the data and its size will be about 176 MB. (I will
-try to optmize this size later.)
+By default, zipcode data will be generated (~ 3MB) inside a folder called 
+`data/db` at the same folder of `makefile`. 
 
 ## How to use ?
 
@@ -33,7 +31,7 @@ var twZip = new TwZip();
 3 - Search on the fly
 
 ```javascript
-twZip.search('台北市中正區三元街', function(data) {
+twZip.search('台北市中正區', function(data) {
   console.log(data);
 });
 ```
@@ -43,8 +41,8 @@ twZip.search('台北市中正區三元街', function(data) {
 1. I implemented a basic cache mechanism that will keep loaded data inside TwZip
 and you don't have to load it again.
 
-2. In TwZip.js, You can directly search the whole address (3 layers at maximun)
-like previous example. It will send out three requests at the same time to load
+2. In TwZip.js, You can directly search the whole address (2 layers at maximun)
+like previous example. It will send out two requests at the same time to load
 each layer's data back from server.
 
 ## Author

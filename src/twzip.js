@@ -27,11 +27,9 @@
       this._reField = [];
       this._reField[0] = /[縣市島台]/;
       this._reField[1] = /([鄉市鎮區台]|群島)/;
-      this._reField[2] = /([路街巷村段台]|市場)/;
     },
     _fetchData: function(zipFields) {
       // path will become something like :
-      //   server/台北市/信義區/信義路/summary.json
       //   server/台北市/信義區/summary.json
       //   server/台北市/summary.json
       //   server/summary.json
@@ -49,7 +47,7 @@
       if (!layer) {
         layer = 0;
       }
-      else if (layer >= 3) {
+      else if (layer >= 2) {
         // we only process 3 layers right now
         return _cachedArray;
       }
@@ -107,14 +105,6 @@
         }
         return this._zipCache[zipFields[0]][zipFields[1]];
       }
-      else {
-        if (!this._zipCache[zipFields[0]] ||
-          !this._zipCache[zipFields[0]][zipFields[1]] ||
-          !this._zipCache[zipFields[0]][zipFields[1]][zipFields[2]]) {
-          return false;
-        }
-        return this._zipCache[zipFields[0]][zipFields[1]][zipFields[2]];
-      }
     },
     _changeDataToObject: function(summary) {
       var obj = {};
@@ -142,11 +132,17 @@
       }
       // ['台北市', '信義區']
       else if (zipFields.length === 2) {
+        // TODO
+        //
+        // summary would be {
+        //   '大道路': ['...', '...'],
+        //   '中坡北路': ['...'],
+        //   ...
+        // }
+        //
+        // We can add one more feature here to return the whole
+        // object if any certain option is on
         this._zipCache[zipFields[0]][zipFields[1]] = summary;
-      }
-      // ['台北市', '信義區', '信義路']
-      else if (zipFields.length === 3) {
-        this._zipCache[zipFields[0]][zipFields[1]][zipFields[2]] = summary;
       }
     },
     search: function(userInput, cb) {
@@ -171,13 +167,12 @@
           deferredList.push(deferred);
         }
       }
-      // twZip.search('台北市信義區信義路')
+      // twZip.search('台北市信義區')
       else {
         for (var i = 0; i < zipFields.length; i++) {
-          // ['台北市', '信義區', '信義路'] would be
+          // ['台北市', '信義區'] would be
           // ['台北市']
           // ['台北市', '信義區']
-          // ['台北市', '信義區', '信義路']
           partOfZipcode = zipFields.slice(0, i + 1);
           partOfZipcodeList.push(partOfZipcode);
 
@@ -193,7 +188,7 @@
             // consistent.
             deferred = $.Deferred();
             deferred.resolve({
-              summary: cache  
+              summary: cache
             });
           }
           deferredList.push(deferred);
