@@ -38,7 +38,8 @@ lineReader.eachLine(zipFile, function(line) {
     hash[c[1]][c[2]][c[3]] = [];
   }
   
-  hash[c[1]][c[2]][c[3]].push(line);
+  // we only keep zipcode and its specific rule
+  hash[c[1]][c[2]][c[3]].push(c[0] + ',' + c[4]);
 
   // {
   //   '臺北市': {
@@ -62,7 +63,6 @@ lineReader.eachLine(zipFile, function(line) {
   }));
 
   cityNames.forEach(function(cityName) {
-
     var strictNames = Object.keys(hash[cityName]);
     var cityFolderPath = path.join(baseFolder, cityName);
 
@@ -78,14 +78,7 @@ lineReader.eachLine(zipFile, function(line) {
     strictNames.forEach(function(strictName) {
       var roadNames = Object.keys(hash[cityName][strictName]);
       var strictFolderPath = path.join(baseFolder, cityName, strictName);
-
-      if (!DEBUG) {
-        fs.mkdirSync(strictFolderPath);
-        fs.writeFileSync(path.join(strictFolderPath, 'summary.json'),
-          JSON.stringify({
-            summary: roadNames
-        }));
-      }
+      var finalData = {};
 
       // create all road folders
       roadNames.forEach(function(roadName) {
@@ -95,13 +88,17 @@ lineReader.eachLine(zipFile, function(line) {
         // TODO
         // let's process this part for future use
         if (!DEBUG) {
-          fs.mkdirSync(roadFolderPath);
-          fs.writeFileSync(path.join(roadFolderPath, 'summary.json'),
-            JSON.stringify({
-              summary: hash[cityName][strictName][roadName]
-          }));
+          finalData[roadName] = hash[cityName][strictName][roadName];
         }
       });
+
+      if (!DEBUG) {
+        fs.mkdirSync(strictFolderPath);
+        fs.writeFileSync(path.join(strictFolderPath, 'summary.json'),
+          JSON.stringify({
+            summary: finalData
+        }));
+      }
     });
   });
 });
