@@ -45,11 +45,15 @@ and you don't have to load it again.
 like previous example. It will send out two requests at the same time to load
 each layer's data back from server.
 
+3. Original data is coming from http://www.post.gov.tw/
+
 ## Author
 
 EragonJ (Chia-Lung, Chen)
 
 Email: eragonj@eragonj.me
+
+Blog: http://eragonj.me
 
 ## License
 
