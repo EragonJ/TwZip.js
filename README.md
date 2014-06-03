@@ -1,5 +1,7 @@
 # TwZip.js
 
+![TwZip.js](https://raw.githubusercontent.com/EragonJ/TwZip.js/master/public/images/twzip.jpg)
+
 ## What is TwZip.js
 
 TwZip.js - A jQuery plugin that can help you search Taiwan Zipcode without
